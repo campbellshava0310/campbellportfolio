@@ -2,96 +2,78 @@ import type { Config } from "tailwindcss"
 
 const config = {
   darkMode: ["class"],
-  content: [
-    "./pages/**/*.{ts,tsx}",
-    "./components/**/*.{ts,tsx}",
-    "./app/**/*.{ts,tsx}",
-    "./src/**/*.{ts,tsx}",
-    "*.{js,ts,jsx,tsx,mdx}",
-  ],
-  prefix: "",
+  content: ["./app/**/*.{ts,tsx}", "./components/**/*.{ts,tsx}", "./lib/**/*.{ts,tsx}"],
   theme: {
-    container: {
-      center: true,
-      padding: "2rem",
-      screens: {
-        "2xl": "1400px",
-      },
-    },
     extend: {
       colors: {
-        border: "hsl(var(--border))",
-        input: "hsl(var(--input))",
-        ring: "hsl(var(--ring))",
-        background: "hsl(var(--background))",
-        foreground: "hsl(var(--foreground))",
-        primary: {
-          DEFAULT: "hsl(210, 100%, 60%)", // Brighter blue for dark mode
-          foreground: "hsl(0, 0%, 100%)",
-        },
-        secondary: {
-          DEFAULT: "hsl(280, 80%, 70%)", // Brighter purple for dark mode
-          foreground: "hsl(var(--secondary-foreground))",
-        },
-        destructive: {
-          DEFAULT: "hsl(var(--destructive))",
-          foreground: "hsl(var(--destructive-foreground))",
-        },
-        muted: {
-          DEFAULT: "hsl(var(--muted))",
-          foreground: "hsl(var(--muted-foreground))",
-        },
-        accent: {
-          DEFAULT: "hsl(160, 100%, 50%)", // Brighter teal for dark mode
-          foreground: "hsl(var(--accent-foreground))",
-        },
-        popover: {
-          DEFAULT: "hsl(var(--popover))",
-          foreground: "hsl(var(--popover-foreground))",
-        },
-        card: {
-          DEFAULT: "hsl(var(--card))",
-          foreground: "hsl(var(--card-foreground))",
-        },
+        bg: "var(--bg)",
+        "bg-subtle": "var(--bg-subtle)",
+        surface: "var(--surface)",
+        fg: "var(--fg)",
+        "fg-secondary": "var(--fg-secondary)",
+        "fg-muted": "var(--fg-muted)",
+        line: "var(--border)",
+        "line-strong": "var(--border-strong)",
+        accent: "var(--accent)",
+        "accent-hover": "var(--accent-hover)",
+        "accent-fg": "var(--accent-fg)",
+      },
+      fontFamily: {
+        sans: ["var(--font-sans)", "ui-sans-serif", "system-ui", "-apple-system", "Segoe UI", "sans-serif"],
+        mono: ["var(--font-mono)"],
+      },
+      fontSize: {
+        // Fluid scale. Confident, never billboard-sized.
+        display: ["clamp(2.75rem, 1.65rem + 4.6vw, 5.25rem)", { lineHeight: "0.98", letterSpacing: "-0.035em" }],
+        h1: ["clamp(2.125rem, 1.5rem + 2.7vw, 3.5rem)", { lineHeight: "1.06", letterSpacing: "-0.03em" }],
+        h2: ["clamp(1.625rem, 1.25rem + 1.7vw, 2.375rem)", { lineHeight: "1.12", letterSpacing: "-0.026em" }],
+        h3: ["clamp(1.1875rem, 1.08rem + 0.45vw, 1.4375rem)", { lineHeight: "1.24", letterSpacing: "-0.018em" }],
+        lead: ["clamp(1.0625rem, 0.99rem + 0.42vw, 1.3125rem)", { lineHeight: "1.55", letterSpacing: "-0.012em" }],
+        body: ["1rem", { lineHeight: "1.68" }],
+        sm: ["0.875rem", { lineHeight: "1.6" }],
+        xs: ["0.8125rem", { lineHeight: "1.5" }],
+        micro: ["0.6875rem", { lineHeight: "1", letterSpacing: "0.1em" }],
       },
       borderRadius: {
-        lg: "var(--radius)",
-        md: "calc(var(--radius) - 2px)",
-        sm: "calc(var(--radius) - 4px)",
+        xs: "var(--r-xs)",
+        sm: "var(--r-sm)",
+        md: "var(--r-md)",
+        lg: "var(--r-lg)",
+      },
+      boxShadow: {
+        sm: "var(--shadow-sm)",
+        md: "var(--shadow-md)",
+      },
+      transitionTimingFunction: {
+        DEFAULT: "var(--ease)",
+        out: "var(--ease-out)",
+      },
+      maxWidth: {
+        prose: "62ch",
+        measure: "46ch",
       },
       keyframes: {
-        "accordion-down": {
-          from: { height: "0" },
-          to: { height: "var(--radix-accordion-content-height)" },
+        "fade-up": {
+          from: { opacity: "0", transform: "translateY(8px)" },
+          to: { opacity: "1", transform: "none" },
         },
-        "accordion-up": {
-          from: { height: "var(--radix-accordion-content-height)" },
-          to: { height: "0" },
+        "fade-in": {
+          from: { opacity: "0" },
+          to: { opacity: "1" },
         },
-        "matrix-effect": {
-          "0%": { transform: "translateY(-100%)" },
-          "100%": { transform: "translateY(100vh)" },
-        },
-        "pulse-glow": {
-          "0%, 100%": { boxShadow: "0 0 10px rgba(56, 189, 248, 0.5)" },
-          "50%": { boxShadow: "0 0 20px rgba(56, 189, 248, 0.8)" },
-        },
-        float: {
-          "0%, 100%": { transform: "translateY(0)" },
-          "50%": { transform: "translateY(-10px)" },
+        pulse: {
+          "0%, 100%": { opacity: "1" },
+          "50%": { opacity: "0.35" },
         },
       },
       animation: {
-        "accordion-down": "accordion-down 0.2s ease-out",
-        "accordion-up": "accordion-up 0.2s ease-out",
-        "matrix-effect": "matrix-effect 20s linear infinite",
-        "pulse-glow": "pulse-glow 2s ease-in-out infinite",
-        float: "float 6s ease-in-out infinite",
+        "fade-up": "fade-up var(--dur-slow) var(--ease-out) both",
+        "fade-in": "fade-in var(--dur) var(--ease) both",
+        pulse: "pulse 2.8s var(--ease) infinite",
       },
     },
   },
-  plugins: [require("tailwindcss-animate")],
+  plugins: [],
 } satisfies Config
 
 export default config
-

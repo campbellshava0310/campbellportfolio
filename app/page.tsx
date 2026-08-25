@@ -1,22 +1,29 @@
-import { HeroSection } from "@/components/hero-section"
-import { AboutSection } from "@/components/about-section"
-import { SkillsSection } from "@/components/skills-section"
-import { ProjectsSection } from "@/components/projects-section"
-import { ContactSection } from "@/components/contact-section"
-import { Footer } from "@/components/footer"
-import ExperienceSection from "@/components/ExperienceSection"
+import { SiteHeader } from "@/components/site-header"
+import { SiteFooter } from "@/components/site-footer"
+import { Hero } from "@/components/sections/hero"
+import { FeaturedWork } from "@/components/sections/featured-work"
+import { Experience } from "@/components/sections/experience"
+import { Engineering } from "@/components/sections/engineering"
+import { Projects } from "@/components/sections/projects"
+import { Education } from "@/components/sections/education"
+import { About } from "@/components/sections/about"
+import { Contact } from "@/components/sections/contact"
 
-export default function Home() {
+export default function HomePage() {
   return (
-    <div className="min-h-screen bg-background">
-      <HeroSection />
-      <AboutSection />
-      <ExperienceSection />
-      <SkillsSection />
-      <ProjectsSection />
-      <ContactSection />
-      <Footer />
-    </div>
+    <>
+      <SiteHeader />
+      <main id="main">
+        <Hero />
+        <FeaturedWork />
+        <Experience />
+        <Engineering />
+        <Projects />
+        <Education />
+        <About />
+        <Contact />
+      </main>
+      <SiteFooter />
+    </>
   )
 }
-

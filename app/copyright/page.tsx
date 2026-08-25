@@ -1,20 +1,37 @@
-import { Lock } from "lucide-react";
-import Link from "next/link";
+import type { Metadata } from "next"
+import { Action, Container } from "@/components/primitives"
+import { profile } from "@/lib/content"
+
+export const metadata: Metadata = {
+  title: "Restricted resource",
+  description: "This project is client-owned and its source is not public.",
+  robots: { index: false, follow: false },
+}
 
 export default function CopyrightPage() {
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center bg-background text-center px-4">
-      <div className="bg-card/80 border border-primary/20 rounded-xl shadow-lg p-10 max-w-lg w-full animate-fade-in">
-        <Lock className="mx-auto mb-6 h-16 w-16 text-primary animate-pulse" />
-        <h1 className="text-3xl md:text-4xl font-bold mb-4 text-primary">Resource Restricted</h1>
-        <p className="text-lg text-foreground/80 mb-6 font-mono">
-          Sorry, you can't view this resource due to copyright restrictions. This is because i dont own the rights to The system but i Developed it<br />
-          Please contact me if you need more information or access.
-        </p>
-        <Link href="/" legacyBehavior>
-          <a className="inline-block px-6 py-3 rounded-md bg-primary text-background font-bold shadow hover:bg-primary/80 transition-all">Return Home</a>
-        </Link>
-      </div>
-    </div>
-  );
+    <main className="flex min-h-screen items-center py-24">
+      <Container>
+        <div className="max-w-prose">
+          <p className="label">Access</p>
+          <h1 className="mt-5 text-h1 font-medium">This one is not mine to publish.</h1>
+          <p className="mt-6 text-lead text-fg-secondary">
+            I built this system, but the client owns it. The source and the running instance are theirs, so neither is
+            public here.
+          </p>
+          <p className="mt-4 text-body text-fg-secondary">
+            If you need to see the work — a walkthrough, an architecture discussion, or a reference — ask me directly
+            and I will arrange what I am able to share.
+          </p>
+
+          <div className="mt-10 flex flex-wrap gap-3">
+            <Action href="/">Back to the portfolio</Action>
+            <Action href={`mailto:${profile.email}`} variant="secondary">
+              Email me
+            </Action>
+          </div>
+        </div>
+      </Container>
+    </main>
+  )
 }
