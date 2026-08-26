@@ -1,0 +1,35 @@
+# Netlify deployment.
+#
+# This site is a Next.js static export: `next build` writes plain HTML, CSS and
+# JS to `out/`, and there is no server bundle. Publishing `out/` directly means
+# Netlify's Next.js Runtime is not involved at all, which is what we want —
+# the runtime does not currently support Next 16 and produced a site-wide 404.
+
+[build]
+  command = "npm run build"
+  publish = "out"
+
+[build.environment]
+  # Next 16 requires Node >= 20.9.
+  NODE_VERSION = "22"
+
+# The metadata route emits a real PNG at an extensionless path, so the type has
+# to be declared or social crawlers receive application/octet-stream.
+[[headers]]
+  for = "/opengraph-image"
+  [headers.values]
+    Content-Type = "image/png"
+    Cache-Control = "public, max-age=3600"
+
+# Fingerprinted build assets never change under the same name.
+[[headers]]
+  for = "/_next/static/*"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000, immutable"
+
+[[headers]]
+  for = "/*"
+  [headers.values]
+    X-Content-Type-Options = "nosniff"
+    Referrer-Policy = "strict-origin-when-cross-origin"
+    X-Frame-Options = "SAMEORIGIN"

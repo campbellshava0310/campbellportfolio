@@ -4,6 +4,9 @@ import { profile } from "@/lib/content"
 export const alt = `${profile.name} — ${profile.role}`
 export const size = { width: 1200, height: 630 }
 export const contentType = "image/png"
+// Rendered once at build time and written out as a PNG, so the static export
+// has nothing left to compute at request time.
+export const dynamic = "force-static"
 
 /**
  * Social card, generated at build time from the same tokens as the site.
