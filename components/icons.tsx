@@ -86,6 +86,19 @@ export const Close = (p: IconProps) => (
   </Stroke>
 )
 
+export const Search = (p: IconProps) => (
+  <Stroke {...p}>
+    <circle cx="7.2" cy="7.2" r="4.4" />
+    <path d="M10.5 10.5L13.5 13.5" />
+  </Stroke>
+)
+
+export const Check = (p: IconProps) => (
+  <Stroke {...p}>
+    <path d="M3 8.5l3.2 3.2L13 4.9" />
+  </Stroke>
+)
+
 /* --- Brand marks. Solid, drawn to their own proportions. ------------------ */
 
 export const GitHub = (p: IconProps) => (

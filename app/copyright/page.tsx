@@ -12,9 +12,9 @@ export default function CopyrightPage() {
   return (
     <main className="flex min-h-screen items-center py-24">
       <Container>
-        <div className="max-w-prose">
+        <div className="max-w-[60ch]">
           <p className="label">Access</p>
-          <h1 className="mt-5 text-h1 font-medium">This one is not mine to publish.</h1>
+          <h1 className="mt-5 text-h1 font-semibold">This one is not mine to publish.</h1>
           <p className="mt-6 text-lead text-fg-secondary">
             I built this system, but the client owns it. The source and the running instance are theirs, so neither is
             public here.

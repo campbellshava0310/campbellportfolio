@@ -2,6 +2,7 @@ import { SiteHeader } from "@/components/site-header"
 import { SiteFooter } from "@/components/site-footer"
 import { Hero } from "@/components/sections/hero"
 import { FeaturedWork } from "@/components/sections/featured-work"
+import { IrrigaIQ } from "@/components/sections/irrigaiq"
 import { Experience } from "@/components/sections/experience"
 import { Engineering } from "@/components/sections/engineering"
 import { Projects } from "@/components/sections/projects"
@@ -16,6 +17,7 @@ export default function HomePage() {
       <main id="main">
         <Hero />
         <FeaturedWork />
+        <IrrigaIQ />
         <Experience />
         <Engineering />
         <Projects />

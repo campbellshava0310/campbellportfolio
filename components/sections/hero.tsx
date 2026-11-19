@@ -1,158 +1,99 @@
-"use client"
-
-import { useEffect, useRef } from "react"
+import Image from "next/image"
 import { Action, Container } from "@/components/primitives"
-import { ArrowDown } from "@/components/icons"
 import { heroMeta, profile } from "@/lib/content"
 
 /**
  * Hero.
  *
- * One interaction: a fine engineering grid that is only visible where the
- * pointer is, plus a few pixels of counter-parallax between the headline and
- * the metadata. The pointer position is written straight to CSS custom
- * properties inside a rAF loop and eased towards the target, so the whole
- * effect costs one composited repaint per frame and zero React renders.
- *
- * It is disabled outright for coarse pointers and for reduced-motion.
+ * A server component — there is no interactive behaviour here at all. Nothing
+ * tracks the cursor and nothing loops; the composition settles once on load and
+ * then holds still. The only motion is the entrance, handled by the shared
+ * reveal observer.
  */
 export function Hero() {
-  const root = useRef<HTMLElement>(null)
-
-  useEffect(() => {
-    const el = root.current
-    if (!el) return
-    if (!window.matchMedia("(hover: hover) and (pointer: fine)").matches) return
-    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return
-
-    // Target (from the pointer) and current (eased) positions, in 0..1.
-    let tx = 0.5
-    let ty = 0.4
-    let cx = tx
-    let cy = ty
-    let frame = 0
-    let idle = true
-
-    const tick = () => {
-      cx += (tx - cx) * 0.085
-      cy += (ty - cy) * 0.085
-
-      el.style.setProperty("--px", `${(cx * 100).toFixed(2)}%`)
-      el.style.setProperty("--py", `${(cy * 100).toFixed(2)}%`)
-      el.style.setProperty("--mx", (cx - 0.5).toFixed(4))
-      el.style.setProperty("--my", (cy - 0.5).toFixed(4))
-
-      // Park the loop once it has settled; the next pointer move restarts it.
-      if (Math.abs(tx - cx) < 0.0005 && Math.abs(ty - cy) < 0.0005) {
-        frame = 0
-        idle = true
-        return
-      }
-      frame = requestAnimationFrame(tick)
-    }
-
-    const wake = () => {
-      if (!idle) return
-      idle = false
-      frame = requestAnimationFrame(tick)
-    }
-
-    const onMove = (e: PointerEvent) => {
-      const rect = el.getBoundingClientRect()
-      tx = (e.clientX - rect.left) / rect.width
-      ty = (e.clientY - rect.top) / rect.height
-      wake()
-    }
-
-    const onLeave = () => {
-      tx = 0.5
-      ty = 0.4
-      wake()
-    }
-
-    el.dataset.interactive = "true"
-    el.addEventListener("pointermove", onMove, { passive: true })
-    el.addEventListener("pointerleave", onLeave, { passive: true })
-
-    return () => {
-      el.removeEventListener("pointermove", onMove)
-      el.removeEventListener("pointerleave", onLeave)
-      if (frame) cancelAnimationFrame(frame)
-    }
-  }, [])
-
   return (
-    <section
-      ref={root}
-      id="top"
-      className="group/hero relative isolate flex min-h-[92svh] items-center overflow-hidden pb-14 pt-28 sm:pb-16 sm:pt-32"
-    >
-      {/* Pointer-reactive field */}
-      <div
-        aria-hidden="true"
-        className="pointer-field absolute inset-0 -z-10 opacity-0 transition-opacity duration-700 group-data-[interactive=true]/hero:opacity-100"
-      />
-      {/* A single hairline anchoring the composition to the grid */}
-      <div aria-hidden="true" className="absolute inset-x-0 bottom-0 -z-10 h-px bg-line" />
-
+    <section id="top" className="relative overflow-hidden border-b border-line pt-32 pb-16 sm:pt-36 sm:pb-20 lg:pt-40 lg:pb-24">
       <Container>
-        <div
-          className="animate-fade-up will-change-transform"
-          style={{ transform: "translate3d(calc(var(--mx, 0) * 6px), calc(var(--my, 0) * 5px), 0)" }}
-        >
-          <p className="label flex items-center gap-2.5">
-            <span aria-hidden="true" className="relative flex h-1.5 w-1.5">
-              <span className="absolute inline-flex h-full w-full animate-pulse rounded-full bg-accent" />
-            </span>
-            {profile.location}
-            <span className="text-line-strong">/</span>
-            {profile.timezone}
-          </p>
+        <div className="grid items-center gap-x-16 gap-y-14 lg:grid-cols-12">
+          {/* Type */}
+          <div className="lg:col-span-7">
+            <p className="reveal label flex items-center gap-2.5">
+              <span aria-hidden="true" className="size-1.5 rounded-full bg-accent" />
+              {profile.location}
+              <span aria-hidden="true" className="text-line-strong">/</span>
+              {profile.timezone}
+            </p>
 
-          <h1 className="mt-7 text-display font-medium">
-            <span className="block">Chiurai Campbell</span>
-            <span className="block text-fg-secondary">Shava Mgonie</span>
-          </h1>
+            <h1 className="reveal mt-6 text-display font-semibold" style={{ "--reveal-delay": "60ms" } as React.CSSProperties}>
+              <span className="block">Chiurai Campbell</span>
+              <span className="block text-fg-secondary">Shava Mgonie</span>
+            </h1>
 
-          <p className="mt-7 font-mono text-xs uppercase tracking-[0.14em] text-fg-secondary sm:text-[0.8125rem]">
-            {profile.role}
-            <span aria-hidden="true" className="mx-2.5 text-line-strong">
-              ·
-            </span>
-            {profile.secondRole}
-          </p>
+            {/*
+              Two roles, each kept whole. Left as one string they break mid-title
+              on a phone ("… / JAVA ⏎ ENGINEER ·"), so they wrap as units and the
+              separator only appears when both sit on one line.
+            */}
+            <p
+              className="reveal mt-7 flex flex-wrap items-baseline gap-x-2.5 gap-y-1 font-mono text-xs tracking-[0.14em] text-fg-secondary uppercase sm:text-[0.8125rem]"
+              style={{ "--reveal-delay": "120ms" } as React.CSSProperties}
+            >
+              <span className="whitespace-nowrap">{profile.roleLong}</span>
+              <span aria-hidden="true" className="hidden text-line-strong sm:inline">
+                ·
+              </span>
+              <span className="whitespace-nowrap">{profile.secondRole}</span>
+            </p>
 
-          <p className="mt-8 max-w-prose text-lead text-fg-secondary">{profile.positioning}</p>
+            <p
+              className="reveal mt-8 max-w-[52ch] text-lead text-fg-secondary"
+              style={{ "--reveal-delay": "180ms" } as React.CSSProperties}
+            >
+              {profile.positioning}
+            </p>
 
-          <div className="mt-10 flex flex-wrap items-center gap-3">
-            <Action href="#work">Selected work</Action>
-            <Action href={profile.resume} variant="secondary" download>
-              Résumé
-            </Action>
+            <div
+              className="reveal mt-10 flex flex-wrap items-center gap-3"
+              style={{ "--reveal-delay": "240ms" } as React.CSSProperties}
+            >
+              <Action href="#work">Selected work</Action>
+              <Action href={profile.resume} variant="secondary" download>
+                Download CV
+              </Action>
+            </div>
+          </div>
+
+          {/* Portrait. An offset accent panel gives it depth without a gradient. */}
+          <div className="lg:col-span-5">
+            <div className="relative mx-auto w-full max-w-[22rem] lg:ml-auto lg:mr-0">
+              <div
+                aria-hidden="true"
+                className="reveal absolute -right-4 -bottom-4 h-[88%] w-[88%] rounded-lg border border-accent/20 bg-accent/10 sm:-right-5 sm:-bottom-5"
+              />
+              <div className="reveal-media relative aspect-4/5 overflow-hidden rounded-lg border border-line bg-bg-subtle shadow-md">
+                <Image
+                  src="/portrait.jpg"
+                  alt={`${profile.name}, software engineer, Harare`}
+                  fill
+                  priority
+                  sizes="(max-width: 1024px) 85vw, 352px"
+                  className="object-cover"
+                />
+              </div>
+            </div>
           </div>
         </div>
 
-        {/* Metadata strip — counter-parallax, half the distance of the headline */}
-        <dl
-          className="mt-14 grid grid-cols-2 gap-x-8 gap-y-7 border-t border-line pt-8 sm:mt-16 lg:grid-cols-4"
-          style={{ transform: "translate3d(calc(var(--mx, 0) * -3px), calc(var(--my, 0) * -2px), 0)" }}
-        >
+        {/* Metadata strip */}
+        <dl className="mt-16 grid grid-cols-2 gap-x-8 gap-y-8 border-t border-line pt-10 lg:mt-20 lg:grid-cols-4">
           {heroMeta.map((item, i) => (
             <div key={item.label} className="reveal" style={{ "--reveal-delay": `${i * 70}ms` } as React.CSSProperties}>
               <dt className="label">{item.label}</dt>
-              <dd className="mt-2.5 text-sm text-fg">{item.value}</dd>
+              <dd className="mt-3 text-sm font-medium text-fg">{item.value}</dd>
             </div>
           ))}
         </dl>
       </Container>
-
-      <a
-        href="#work"
-        aria-label="Scroll to selected work"
-        className="absolute bottom-6 right-5 hidden h-10 w-10 place-items-center rounded-full border border-line text-fg-muted transition-colors duration-[var(--dur)] hover:border-line-strong hover:text-fg sm:right-8 lg:grid lg:right-14"
-      >
-        <ArrowDown className="h-4 w-4" />
-      </a>
     </section>
   )
 }

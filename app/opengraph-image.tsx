@@ -1,7 +1,7 @@
 import { ImageResponse } from "next/og"
 import { profile } from "@/lib/content"
 
-export const alt = `${profile.name} — ${profile.role}`
+export const alt = `${profile.name} — ${profile.roleLong}`
 export const size = { width: 1200, height: 630 }
 export const contentType = "image/png"
 // Rendered once at build time and written out as a PNG, so the static export
@@ -9,8 +9,8 @@ export const contentType = "image/png"
 export const dynamic = "force-static"
 
 /**
- * Social card, generated at build time from the same tokens as the site.
- * Dark ground, one hairline grid, one accent mark — no image assets involved.
+ * Social card, generated from the same tokens as the site: white ground, one
+ * accent mark, no image assets involved.
  */
 export default function OpengraphImage() {
   return new ImageResponse(
@@ -22,32 +22,30 @@ export default function OpengraphImage() {
           display: "flex",
           flexDirection: "column",
           justifyContent: "space-between",
-          backgroundColor: "#0c0c0d",
-          backgroundImage:
-            "linear-gradient(to right, #1b1b1d 1px, transparent 1px), linear-gradient(to bottom, #1b1b1d 1px, transparent 1px)",
-          backgroundSize: "72px 72px",
+          backgroundColor: "#ffffff",
           padding: "72px 80px",
         }}
       >
         <div style={{ display: "flex", alignItems: "center", gap: 14 }}>
-          <div style={{ width: 10, height: 10, borderRadius: 99, backgroundColor: "#e08b4f" }} />
-          <div style={{ fontSize: 20, letterSpacing: 3, color: "#74716a", textTransform: "uppercase" }}>
+          <div style={{ width: 12, height: 12, borderRadius: 99, backgroundColor: "#1a56f0" }} />
+          <div style={{ fontSize: 20, letterSpacing: 3, color: "#646b7a", textTransform: "uppercase" }}>
             Harare, Zimbabwe
           </div>
         </div>
 
         <div style={{ display: "flex", flexDirection: "column" }}>
-          <div style={{ fontSize: 82, color: "#f2f1ed", letterSpacing: -3, lineHeight: 1.02 }}>Chiurai Campbell</div>
-          <div style={{ fontSize: 82, color: "#a5a29a", letterSpacing: -3, lineHeight: 1.02 }}>Shava Mgonie</div>
+          <div style={{ fontSize: 84, color: "#0a0c10", letterSpacing: -3, lineHeight: 1.02 }}>Chiurai Campbell</div>
+          <div style={{ fontSize: 84, color: "#3f4654", letterSpacing: -3, lineHeight: 1.02 }}>Shava Mgonie</div>
         </div>
 
         <div style={{ display: "flex", flexDirection: "column", gap: 22 }}>
-          <div style={{ width: "100%", height: 1, backgroundColor: "#232325" }} />
+          <div style={{ width: "100%", height: 2, backgroundColor: "#1a56f0" }} />
           <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-            <div style={{ fontSize: 24, color: "#f2f1ed", letterSpacing: 1 }}>{profile.role}</div>
-            <div style={{ fontSize: 20, color: "#74716a", letterSpacing: 2 }}>
-              JAVA · SPRING BOOT · PYTHON · DOCKER
+            {/* One text node: Satori requires explicit display on any multi-child div. */}
+            <div style={{ fontSize: 25, color: "#0a0c10", letterSpacing: 0.5 }}>
+              {`${profile.roleLong} · ${profile.secondRole}`}
             </div>
+            <div style={{ fontSize: 19, color: "#646b7a", letterSpacing: 2 }}>JAVA · SPRING BOOT · PYTHON · DOCKER</div>
           </div>
         </div>
       </div>

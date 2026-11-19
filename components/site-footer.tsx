@@ -3,19 +3,22 @@ import { profile, rippleLinks } from "@/lib/content"
 
 const LINKS = [
   { label: "LinkedIn", href: profile.linkedin.url, external: true },
+  { label: "GitHub", href: profile.github.url, external: true },
   { label: "Email", href: `mailto:${profile.email}`, external: false },
   { label: "Ripple", href: rippleLinks.site, external: true },
-  { label: "Résumé", href: profile.resume, external: false, download: true },
+  { label: "CV", href: profile.resume, external: false, download: true },
 ] as const
 
 export function SiteFooter() {
   return (
-    <footer className="border-t border-line py-12">
+    <footer className="border-t border-line bg-bg-subtle py-14">
       <Container>
         <div className="flex flex-col gap-10 sm:flex-row sm:items-start sm:justify-between">
           <div>
-            <p className="text-sm font-medium text-fg">{profile.name}</p>
-            <p className="mt-1.5 text-sm text-fg-secondary">{profile.role}</p>
+            <p className="text-sm font-semibold text-fg">{profile.name}</p>
+            <p className="mt-1.5 text-sm text-fg-secondary">
+              {profile.roleLong} · {profile.secondRole}
+            </p>
             <p className="mt-1 text-sm text-fg-muted">{profile.location}</p>
           </div>
 
@@ -43,7 +46,7 @@ export function SiteFooter() {
           </p>
           <a
             href="#top"
-            className="font-mono text-[0.6875rem] uppercase tracking-[0.1em] text-fg-muted transition-colors duration-[var(--dur)] hover:text-fg"
+            className="font-mono text-[0.6875rem] tracking-[0.1em] text-fg-muted uppercase transition-colors duration-[var(--dur)] hover:text-fg"
           >
             Back to top
           </a>

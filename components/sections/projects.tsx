@@ -12,8 +12,8 @@ import { cn } from "@/lib/utils"
  *
  * Rows rather than a grid of matching tiles, so nothing here competes with
  * Ripple. Each row carries what a reader needs to judge it — role, stack,
- * outcome — with the engineering detail one click away rather than hidden
- * behind a hover state that a keyboard or a touchscreen cannot reach.
+ * outcome — with the engineering detail one click away rather than behind a
+ * hover state a keyboard or a touchscreen cannot reach.
  */
 function ProjectRow({ project, index }: { project: Project; index: number }) {
   const [open, setOpen] = useState(false)
@@ -22,26 +22,27 @@ function ProjectRow({ project, index }: { project: Project; index: number }) {
   const hasImage = Boolean(project.image)
 
   return (
-    <article className="reveal group border-b border-line py-10 sm:py-12">
+    <article className="reveal group border-b border-line py-10 sm:py-14">
       <div className="grid gap-x-12 gap-y-8 lg:grid-cols-12">
         <div className={cn("lg:col-span-6", !hasImage && "lg:col-span-7")}>
-          <div className="flex items-baseline gap-3">
-            <span className="label tabular-nums">{String(index + 1).padStart(2, "0")}</span>
+          <div className="flex items-center gap-3">
+            <span className="label tabular-nums text-accent">{String(index + 1).padStart(2, "0")}</span>
+            <span aria-hidden="true" className="h-px w-6 bg-accent/40" />
             <span className="label">{project.category}</span>
           </div>
 
-          <h3 className="mt-5 text-h3 font-medium text-fg">{project.title}</h3>
+          <h3 className="mt-5 text-h3 font-semibold text-fg">{project.title}</h3>
 
-          <p className="mt-4 max-w-prose text-body text-fg-secondary">{project.summary}</p>
+          <p className="mt-4 max-w-[58ch] text-body text-fg-secondary">{project.summary}</p>
 
-          {/* Fixed label column so the values line up down the page. */}
-          <dl className="mt-6 grid grid-cols-[5.5rem_minmax(0,1fr)] gap-x-4 gap-y-2.5 text-sm">
+          {/* Fixed label column so values line up down the page. */}
+          <dl className="mt-6 grid grid-cols-[5.5rem_minmax(0,1fr)] gap-x-4 gap-y-3 text-sm">
             <dt className="label pt-1">Role</dt>
             <dd className="text-fg-secondary">{project.role}</dd>
             {project.outcome ? (
               <>
                 <dt className="label pt-1">Outcome</dt>
-                <dd className="text-fg">{project.outcome}</dd>
+                <dd className="font-medium text-fg">{project.outcome}</dd>
               </>
             ) : null}
           </dl>
@@ -57,7 +58,9 @@ function ProjectRow({ project, index }: { project: Project; index: number }) {
             )}
           >
             <div className="min-h-0">
-              <p className="max-w-prose border-l border-accent pl-5 text-sm text-fg-secondary">{project.detail}</p>
+              <p className="max-w-[58ch] border-l-2 border-accent/50 pl-5 text-sm text-fg-secondary">
+                {project.detail}
+              </p>
             </div>
           </div>
 
@@ -67,11 +70,11 @@ function ProjectRow({ project, index }: { project: Project; index: number }) {
               onClick={() => setOpen((v) => !v)}
               aria-expanded={open}
               aria-controls={panelId}
-              className="inline-flex items-center gap-2 text-sm text-fg-secondary transition-colors duration-[var(--dur)] hover:text-fg"
+              className="inline-flex items-center gap-2 text-sm font-medium text-fg-secondary transition-colors duration-[var(--dur)] hover:text-fg"
             >
               <Plus
                 aria-hidden="true"
-                className={cn("h-3.5 w-3.5 transition-transform duration-[var(--dur)]", open && "rotate-45")}
+                className={cn("size-3.5 transition-transform duration-[var(--dur)]", open && "rotate-45")}
               />
               {open ? "Less" : "How it was built"}
             </button>
@@ -82,29 +85,27 @@ function ProjectRow({ project, index }: { project: Project; index: number }) {
                 href={link.href}
                 target={link.external ? "_blank" : undefined}
                 rel={link.external ? "noopener noreferrer" : undefined}
-                className="group/link inline-flex items-center gap-1.5 text-sm text-accent transition-colors duration-[var(--dur)] hover:text-accent-hover"
+                className="group/link inline-flex items-center gap-1.5 text-sm font-medium text-accent transition-colors duration-[var(--dur)] hover:text-accent-hover"
               >
                 <span className="link-underline">{link.label}</span>
-                <ArrowUpRight className="h-3.5 w-3.5 transition-transform duration-[var(--dur)] group-hover/link:translate-x-px group-hover/link:-translate-y-px" />
+                <ArrowUpRight className="size-3.5 transition-transform duration-[var(--dur)] group-hover/link:translate-x-px group-hover/link:-translate-y-px" />
               </a>
             ))}
           </div>
 
-          {/* With an image alongside, the stack sits under the copy; without
-              one it moves to the empty column so the row stays balanced. */}
           {hasImage ? <StackList items={project.stack} className="mt-8" /> : null}
         </div>
 
         {project.image ? (
           <div className="lg:col-span-5 lg:col-start-8">
-            <div className="relative aspect-[16/10] overflow-hidden rounded-md border border-line bg-bg-subtle">
+            <div className="reveal-media relative aspect-16/10 overflow-hidden rounded-lg border border-line bg-bg-subtle shadow-sm">
               <Image
                 src={project.image.src}
                 alt={project.image.alt}
                 fill
                 sizes="(max-width: 1024px) 92vw, 460px"
                 loading="lazy"
-                className="object-cover transition-transform duration-[600ms] ease-out group-hover:scale-[1.025]"
+                className="object-cover transition-transform duration-700 ease-out group-hover:scale-[1.03]"
               />
             </div>
           </div>
@@ -135,7 +136,7 @@ export function Projects() {
         }
       />
 
-      <div className="mt-14 border-t border-line lg:mt-16">
+      <div className="mt-12 border-t border-line lg:mt-16">
         {projects.map((project, i) => (
           <ProjectRow key={project.id} project={project} index={i} />
         ))}

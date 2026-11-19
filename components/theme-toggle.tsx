@@ -62,7 +62,7 @@ export function ThemeToggle({ className }: { className?: string }) {
       onClick={toggle}
       aria-label={mounted ? `Switch to ${isDark ? "light" : "dark"} theme` : "Switch theme"}
       className={cn(
-        "relative grid h-9 w-9 place-items-center rounded-md border border-line text-fg-secondary",
+        "relative grid size-9 place-items-center rounded-md border border-line bg-surface text-fg-secondary shadow-xs",
         "transition-colors duration-[var(--dur)] hover:border-line-strong hover:text-fg",
         className,
       )}
@@ -70,13 +70,13 @@ export function ThemeToggle({ className }: { className?: string }) {
       {/* Both icons render; opacity crossfades so there is no layout tick. */}
       <Sun
         className={cn(
-          "absolute h-4 w-4 transition-[opacity,transform] duration-[var(--dur)]",
+          "absolute size-4 transition-[opacity,transform] duration-[var(--dur)]",
           isDark ? "rotate-0 opacity-100" : "-rotate-90 opacity-0",
         )}
       />
       <Moon
         className={cn(
-          "absolute h-4 w-4 transition-[opacity,transform] duration-[var(--dur)]",
+          "absolute size-4 transition-[opacity,transform] duration-[var(--dur)]",
           isDark ? "rotate-90 opacity-0" : "rotate-0 opacity-100",
         )}
       />

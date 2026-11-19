@@ -3,15 +3,16 @@
 import { useCallback, useEffect, useRef, useState } from "react"
 import { navigation, profile } from "@/lib/content"
 import { ThemeToggle } from "@/components/theme-toggle"
+import { CommandPalette } from "@/components/command-palette"
 import { Close, Download, Menu } from "@/components/icons"
 import { cn } from "@/lib/utils"
 
 /**
  * Every section the spy watches — including the two that are not in the nav.
  * Observing them too means the marker clears when the reader is in "Projects"
- * or "Education", rather than leaving a stale item lit.
+ * or "Education" rather than leaving a stale item lit.
  */
-const SPY_IDS = [...navigation.map((n) => n.href.slice(1)), "projects", "education"]
+const SPY_IDS = [...navigation.map((n) => n.href.slice(1)), "irrigaiq", "projects", "education"]
 
 export function SiteHeader() {
   const [condensed, setCondensed] = useState(false)
@@ -20,8 +21,8 @@ export function SiteHeader() {
   const panelRef = useRef<HTMLDivElement>(null)
   const triggerRef = useRef<HTMLButtonElement>(null)
 
-  /* Condense on scroll. rAF-gated, and state only changes when the threshold
-     is actually crossed — the listener runs often, React does not. */
+  /* Condense on scroll. rAF-gated, and state only changes when the threshold is
+     actually crossed — the listener runs often, React does not. */
   useEffect(() => {
     let frame = 0
     let last = false
@@ -44,13 +45,10 @@ export function SiteHeader() {
     }
   }, [])
 
-  /* Scroll spy. The topmost section intersecting the upper band of the
-     viewport wins, so the marker tracks reading position rather than
-     whichever section happened to fire last. */
+  /* Scroll spy. The topmost section intersecting the upper band wins, so the
+     marker tracks reading position rather than whichever fired last. */
   useEffect(() => {
-    const sections = SPY_IDS.map((id) => document.getElementById(id)).filter(
-      (el): el is HTMLElement => el !== null,
-    )
+    const sections = SPY_IDS.map((id) => document.getElementById(id)).filter((el): el is HTMLElement => el !== null)
     if (sections.length === 0) return
 
     const visible = new Map<string, number>()
@@ -61,13 +59,36 @@ export function SiteHeader() {
           else visible.delete(entry.target.id)
         }
         if (visible.size === 0) return
-        const top = [...visible.entries()].sort((a, b) => a[1] - b[1])[0][0]
-        setActive(top)
+        setActive([...visible.entries()].sort((a, b) => a[1] - b[1])[0][0])
       },
       { rootMargin: "-20% 0px -65% 0px", threshold: 0 },
     )
     sections.forEach((s) => observer.observe(s))
     return () => observer.disconnect()
+  }, [])
+
+  /* Reading progress. Written to a CSS custom property inside a rAF loop, so
+     the bar repaints on the compositor and React never re-renders on scroll. */
+  const progressRef = useRef<HTMLDivElement>(null)
+  useEffect(() => {
+    let frame = 0
+    const read = () => {
+      frame = 0
+      const max = document.documentElement.scrollHeight - window.innerHeight
+      const pct = max > 0 ? Math.min(1, Math.max(0, window.scrollY / max)) : 0
+      progressRef.current?.style.setProperty("--progress", pct.toFixed(4))
+    }
+    const onScroll = () => {
+      if (!frame) frame = requestAnimationFrame(read)
+    }
+    read()
+    window.addEventListener("scroll", onScroll, { passive: true })
+    window.addEventListener("resize", onScroll)
+    return () => {
+      window.removeEventListener("scroll", onScroll)
+      window.removeEventListener("resize", onScroll)
+      if (frame) cancelAnimationFrame(frame)
+    }
   }, [])
 
   const closeMenu = useCallback(() => {
@@ -120,38 +141,38 @@ export function SiteHeader() {
     <>
       <a
         href="#main"
-        className="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-[60] focus:rounded-md focus:bg-fg focus:px-4 focus:py-2 focus:text-sm focus:text-bg"
+        className="sr-only focus:not-sr-only focus:fixed focus:top-4 focus:left-4 focus:z-60 focus:rounded-md focus:bg-fg focus:px-4 focus:py-2 focus:text-sm focus:text-bg"
       >
         Skip to content
       </a>
 
       <header
         className={cn(
-          "fixed inset-x-0 top-0 z-50 transition-[background-color,border-color,backdrop-filter] duration-[var(--dur-slow)]",
+          "fixed inset-x-0 top-0 z-50 overflow-hidden transition-[background-color,border-color,backdrop-filter,box-shadow] duration-[var(--dur-slow)]",
           condensed
-            ? "border-b border-line bg-bg/80 backdrop-blur-xl supports-[backdrop-filter]:bg-bg/65"
+            ? "border-b border-line bg-bg/85 shadow-xs backdrop-blur-xl"
             : "border-b border-transparent bg-transparent",
         )}
       >
         <div
           className={cn(
             "container-page flex items-center justify-between transition-[height] duration-[var(--dur-slow)]",
-            condensed ? "h-14" : "h-[4.5rem]",
+            condensed ? "h-14" : "h-20",
           )}
         >
           <a
             href="#top"
-            className="group flex items-baseline gap-2.5 text-sm font-medium tracking-tight text-fg"
+            className="group flex items-center gap-2.5 text-sm font-semibold tracking-tight text-fg"
             aria-label={`${profile.shortName} — back to top`}
           >
             <span
               aria-hidden="true"
-              className="h-1.5 w-1.5 shrink-0 translate-y-[-1px] rounded-full bg-accent transition-transform duration-[var(--dur)] group-hover:scale-125"
+              className="size-2 shrink-0 rounded-full bg-accent transition-transform duration-[var(--dur)] group-hover:scale-125"
             />
             {profile.shortName}
           </a>
 
-          <nav aria-label="Primary" className="hidden items-center gap-1 md:flex">
+          <nav aria-label="Primary" className="hidden items-center gap-0.5 md:flex">
             {navigation.map((item) => {
               const isActive = active === item.href.slice(1)
               return (
@@ -160,15 +181,15 @@ export function SiteHeader() {
                   href={item.href}
                   aria-current={isActive ? "true" : undefined}
                   className={cn(
-                    "relative rounded-sm px-3 py-2 text-sm transition-colors duration-[var(--dur)]",
-                    isActive ? "text-fg" : "text-fg-secondary hover:text-fg",
+                    "relative rounded-sm px-3.5 py-2 text-sm font-medium transition-colors duration-[var(--dur)]",
+                    isActive ? "text-accent" : "text-fg-secondary hover:text-fg",
                   )}
                 >
                   {item.label}
                   <span
                     aria-hidden="true"
                     className={cn(
-                      "absolute inset-x-3 -bottom-px h-px origin-left bg-accent transition-transform duration-[var(--dur-slow)] ease-out",
+                      "absolute inset-x-3.5 -bottom-px h-0.5 origin-left rounded-full bg-accent transition-transform duration-[var(--dur-slow)] ease-out",
                       isActive ? "scale-x-100" : "scale-x-0",
                     )}
                   />
@@ -178,13 +199,14 @@ export function SiteHeader() {
           </nav>
 
           <div className="flex items-center gap-2">
+            <CommandPalette />
             <a
               href={profile.resume}
               download=""
-              className="hidden h-9 items-center gap-2 rounded-md border border-line px-3.5 text-xs text-fg-secondary transition-colors duration-[var(--dur)] hover:border-line-strong hover:text-fg sm:inline-flex"
+              className="hidden h-9 items-center gap-2 rounded-md border border-line bg-surface px-3.5 text-xs font-medium text-fg-secondary shadow-xs transition-colors duration-[var(--dur)] hover:border-line-strong hover:text-fg sm:inline-flex"
             >
-              <Download className="h-3.5 w-3.5" />
-              Résumé
+              <Download className="size-3.5" />
+              CV
             </a>
             <ThemeToggle />
             <button
@@ -193,26 +215,30 @@ export function SiteHeader() {
               onClick={() => setMenuOpen(true)}
               aria-label="Open menu"
               aria-expanded={menuOpen}
-              className="grid h-9 w-9 place-items-center rounded-md border border-line text-fg-secondary transition-colors duration-[var(--dur)] hover:text-fg md:hidden"
+              className="grid size-9 place-items-center rounded-md border border-line bg-surface text-fg-secondary shadow-xs transition-colors duration-[var(--dur)] hover:text-fg md:hidden"
             >
-              <Menu className="h-4 w-4" />
+              <Menu className="size-4" />
             </button>
           </div>
         </div>
+
+        <div
+          ref={progressRef}
+          aria-hidden="true"
+          className={cn(
+            "absolute inset-x-0 bottom-0 h-0.5 origin-left bg-accent transition-opacity duration-[var(--dur-slow)]",
+            condensed ? "opacity-100" : "opacity-0",
+          )}
+          style={{ transform: "scaleX(var(--progress, 0))" }}
+        />
       </header>
 
       {/* Mobile drawer */}
-      <div
-        className={cn(
-          "fixed inset-0 z-[55] md:hidden",
-          menuOpen ? "pointer-events-auto" : "pointer-events-none",
-        )}
-        aria-hidden={!menuOpen}
-      >
+      <div className={cn("fixed inset-0 z-55 md:hidden", menuOpen ? "pointer-events-auto" : "pointer-events-none")} aria-hidden={!menuOpen}>
         <div
           onClick={closeMenu}
           className={cn(
-            "absolute inset-0 bg-bg/70 backdrop-blur-sm transition-opacity duration-[var(--dur-slow)]",
+            "absolute inset-0 bg-fg/20 backdrop-blur-sm transition-opacity duration-[var(--dur-slow)]",
             menuOpen ? "opacity-100" : "opacity-0",
           )}
         />
@@ -222,7 +248,7 @@ export function SiteHeader() {
           aria-modal={menuOpen}
           aria-label="Menu"
           className={cn(
-            "absolute inset-x-0 top-0 origin-top border-b border-line bg-bg px-5 pb-8 pt-4 shadow-md",
+            "absolute inset-x-0 top-0 origin-top border-b border-line bg-bg px-5 pt-4 pb-8 shadow-lg",
             "transition-[transform,opacity] duration-[var(--dur-slow)] ease-out",
             menuOpen ? "translate-y-0 opacity-100" : "-translate-y-3 opacity-0",
           )}
@@ -233,9 +259,9 @@ export function SiteHeader() {
               type="button"
               onClick={closeMenu}
               aria-label="Close menu"
-              className="grid h-9 w-9 place-items-center rounded-md border border-line text-fg-secondary"
+              className="grid size-9 place-items-center rounded-md border border-line text-fg-secondary"
             >
-              <Close className="h-4 w-4" />
+              <Close className="size-4" />
             </button>
           </div>
 
@@ -245,9 +271,9 @@ export function SiteHeader() {
                 key={item.href}
                 href={item.href}
                 onClick={closeMenu}
-                className="flex items-baseline gap-4 border-b border-line py-4 text-h3 font-medium text-fg"
+                className="flex items-baseline gap-4 border-b border-line py-4 text-h3 font-semibold text-fg"
               >
-                <span className="label tabular-nums">{String(i + 1).padStart(2, "0")}</span>
+                <span className="label tabular-nums text-accent">{String(i + 1).padStart(2, "0")}</span>
                 {item.label}
               </a>
             ))}
@@ -257,10 +283,10 @@ export function SiteHeader() {
             <a
               href={profile.resume}
               download=""
-              className="inline-flex h-11 flex-1 items-center justify-center gap-2 rounded-md bg-fg px-4 text-sm font-medium text-bg"
+              className="inline-flex h-11 flex-1 items-center justify-center gap-2 rounded-md bg-accent px-4 text-sm font-medium text-accent-fg"
             >
-              <Download className="h-4 w-4" />
-              Résumé
+              <Download className="size-4" />
+              CV
             </a>
             <a
               href={`mailto:${profile.email}`}

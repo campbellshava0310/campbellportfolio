@@ -5,11 +5,11 @@ import { RevealObserver } from "@/components/reveal-observer"
 import { profile, rippleLinks } from "@/lib/content"
 import "./globals.css"
 
-/** One typeface, loaded as a variable font, self-hosted by next/font. */
+/** One typeface, loaded as a variable font and self-hosted by next/font. */
 const inter = Inter({
   subsets: ["latin"],
   display: "swap",
-  variable: "--font-sans",
+  variable: "--font-inter",
 })
 
 const SITE_URL = "https://campbellportfolio.netlify.app"
@@ -17,7 +17,7 @@ const SITE_URL = "https://campbellportfolio.netlify.app"
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
   title: {
-    default: `${profile.name} — ${profile.role}`,
+    default: `${profile.name} — ${profile.roleLong}`,
     template: `%s — ${profile.shortName}`,
   },
   description: profile.summary,
@@ -25,8 +25,10 @@ export const metadata: Metadata = {
     "Software Engineer",
     "Java Engineer",
     "Backend Engineer",
+    "Software Project Manager",
     "Spring Boot",
     "Django",
+    "React Native",
     "Distributed Systems",
     "Fintech",
     "Harare",
@@ -38,29 +40,25 @@ export const metadata: Metadata = {
   alternates: { canonical: "/" },
   openGraph: {
     type: "profile",
-    siteName: `${profile.shortName} — ${profile.role}`,
-    title: `${profile.name} — ${profile.role}`,
+    siteName: `${profile.shortName} — ${profile.roleLong}`,
+    title: `${profile.name} — ${profile.roleLong}`,
     description: profile.summary,
     url: SITE_URL,
     locale: "en_GB",
   },
   twitter: {
     card: "summary_large_image",
-    title: `${profile.name} — ${profile.role}`,
+    title: `${profile.name} — ${profile.roleLong}`,
     description: profile.summary,
   },
-  robots: {
-    index: true,
-    follow: true,
-    googleBot: { index: true, follow: true, "max-image-preview": "large" },
-  },
+  robots: { index: true, follow: true, googleBot: { index: true, follow: true, "max-image-preview": "large" } },
   icons: { icon: "/favicon.ico" },
 }
 
 export const viewport: Viewport = {
   themeColor: [
-    { media: "(prefers-color-scheme: light)", color: "#fbfaf7" },
-    { media: "(prefers-color-scheme: dark)", color: "#0c0c0d" },
+    { media: "(prefers-color-scheme: light)", color: "#ffffff" },
+    { media: "(prefers-color-scheme: dark)", color: "#0b0d12" },
   ],
   colorScheme: "light dark",
 }
@@ -71,7 +69,7 @@ const personSchema = {
   "@type": "Person",
   name: profile.name,
   alternateName: profile.shortName,
-  jobTitle: profile.role,
+  jobTitle: [profile.roleLong, profile.secondRole],
   description: profile.summary,
   email: `mailto:${profile.email}`,
   url: SITE_URL,
@@ -84,8 +82,10 @@ const personSchema = {
     "Spring Boot",
     "Python",
     "Django",
+    "React Native",
     "Docker",
     "Payment systems",
+    "Software project management",
   ],
   alumniOf: [
     { "@type": "CollegeOrUniversity", name: "National University of Science and Technology" },
@@ -101,10 +101,11 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       <body className="font-sans antialiased">
         {/* Without JS the observer never runs, so revealed content must not stay hidden. */}
         <noscript>
-          <style>{`.reveal{opacity:1 !important;transform:none !important}`}</style>
+          <style>{`.reveal,.reveal-media{opacity:1 !important;transform:none !important}`}</style>
         </noscript>
 
-        <ThemeProvider attribute="class" defaultTheme="system" enableSystem disableTransitionOnChange>
+        {/* White is the base. Dark is a deliberate companion, not the default. */}
+        <ThemeProvider attribute="class" defaultTheme="light" enableSystem={false} disableTransitionOnChange>
           {children}
           <RevealObserver />
         </ThemeProvider>

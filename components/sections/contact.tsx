@@ -12,12 +12,12 @@ const CHANNELS = [
   { label: "LinkedIn", value: profile.linkedin.handle, href: profile.linkedin.url, icon: LinkedIn, external: true },
   { label: "GitHub", value: profile.github.handle, href: profile.github.url, icon: GitHub, external: true },
   { label: "Ripple", value: "ripplestayconnected.com", href: rippleLinks.site, icon: ArrowUpRight, external: true },
-  { label: "Résumé", value: "PDF, 2 pages", href: profile.resume, icon: Download, external: false },
+  { label: "CV", value: "PDF, 2 pages", href: profile.resume, icon: Download, external: false },
 ] as const
 
 const fieldClass =
-  "w-full border-0 border-b border-line bg-transparent px-0 py-2.5 text-sm text-fg placeholder:text-fg-muted/70 " +
-  "transition-colors duration-[var(--dur)] focus:border-accent focus:outline-none focus:ring-0"
+  "w-full rounded-md border border-line bg-surface px-3.5 py-3 text-sm text-fg shadow-xs placeholder:text-fg-muted/80 " +
+  "transition-[border-color,box-shadow] duration-[var(--dur)] focus:border-accent focus:outline-hidden focus:ring-2 focus:ring-accent/20"
 
 export function Contact() {
   const [status, setStatus] = useState<Status>("idle")
@@ -67,37 +67,39 @@ export function Contact() {
         }
       />
 
-      <div className="mt-14 grid gap-x-16 gap-y-16 lg:mt-20 lg:grid-cols-12">
+      <div className="mt-12 grid gap-x-16 gap-y-14 lg:mt-20 lg:grid-cols-12">
         {/* Primary channel */}
         <div className="lg:col-span-6">
           <a
             href={`mailto:${profile.email}`}
-            className="reveal group inline-flex max-w-full items-start gap-3 text-h2 font-medium tracking-tight text-fg transition-colors duration-[var(--dur)] hover:text-accent"
+            className="reveal group inline-flex max-w-full items-start gap-3 text-h2 font-semibold text-fg transition-colors duration-[var(--dur)] hover:text-accent"
           >
             <span className="break-all">{profile.email}</span>
             <Mail
               aria-hidden="true"
-              className="mt-2 hidden h-5 w-5 shrink-0 text-fg-muted transition-colors duration-[var(--dur)] group-hover:text-accent sm:block"
+              className="mt-2 hidden size-5 shrink-0 text-fg-muted transition-colors duration-[var(--dur)] group-hover:text-accent sm:block"
             />
           </a>
 
-          <ul className="reveal mt-12 border-t border-line">
-            {CHANNELS.map(({ label, value, href, icon: Icon, external }) => (
-              <li key={label}>
+          <ul className="reveal mt-10 overflow-hidden rounded-lg border border-line">
+            {CHANNELS.map(({ label, value, href, icon: Icon, external }, i) => (
+              <li key={label} className={cn(i > 0 && "border-t border-line")}>
                 <a
                   href={href}
                   {...(external ? { target: "_blank", rel: "noopener noreferrer" } : { download: "" })}
-                  className="group flex items-center justify-between gap-6 border-b border-line py-4 transition-colors duration-[var(--dur)] hover:bg-surface"
+                  className="group flex items-center justify-between gap-6 bg-surface px-5 py-4 transition-colors duration-[var(--dur)] hover:bg-bg-subtle"
                 >
                   <span className="flex shrink-0 items-center gap-3.5">
-                    <Icon aria-hidden="true" className="h-4 w-4 shrink-0 text-fg-muted" />
-                    <span className="text-sm text-fg">{label}</span>
+                    <Icon aria-hidden="true" className="size-4 shrink-0 text-fg-muted transition-colors duration-[var(--dur)] group-hover:text-accent" />
+                    <span className="text-sm font-medium text-fg">{label}</span>
                   </span>
                   <span className="flex min-w-0 items-center gap-3">
-                    <span className="line-clamp-1 font-mono text-[0.6875rem] text-fg-muted [overflow-wrap:anywhere]">{value}</span>
+                    <span className="line-clamp-1 font-mono text-[0.6875rem] text-fg-muted [overflow-wrap:anywhere]">
+                      {value}
+                    </span>
                     <ArrowUpRight
                       aria-hidden="true"
-                      className="h-3.5 w-3.5 shrink-0 text-fg-muted transition-transform duration-[var(--dur)] group-hover:translate-x-px group-hover:-translate-y-px"
+                      className="size-3.5 shrink-0 text-fg-muted transition-transform duration-[var(--dur)] group-hover:translate-x-px group-hover:-translate-y-px"
                     />
                   </span>
                 </a>
@@ -106,93 +108,90 @@ export function Contact() {
           </ul>
 
           <address className="reveal mt-10 not-italic">
-            <p className="text-sm font-medium text-fg">{profile.name}</p>
-            <p className="mt-1.5 text-sm text-fg-secondary">{profile.role}</p>
+            <p className="text-sm font-semibold text-fg">{profile.name}</p>
+            <p className="mt-1.5 text-sm text-fg-secondary">
+              {profile.roleLong} · {profile.secondRole}
+            </p>
             <p className="mt-1 text-sm text-fg-muted">{profile.location}</p>
           </address>
         </div>
 
         {/* Message form */}
         <div className="reveal lg:col-span-5 lg:col-start-8">
-          <p className="label">Or send a message</p>
-          <form onSubmit={onSubmit} className="mt-7 space-y-7">
-            {/* Honeypot — hidden from people, tempting to bots. */}
-            <input
-              type="checkbox"
-              name="botcheck"
-              tabIndex={-1}
-              autoComplete="off"
-              aria-hidden="true"
-              className="hidden"
-            />
+          <div className="rounded-lg border border-line bg-surface p-6 shadow-xs sm:p-8">
+            <p className="label">Or send a message</p>
+            <form onSubmit={onSubmit} className="mt-6 space-y-5">
+              {/* Honeypot — hidden from people, tempting to bots. */}
+              <input type="checkbox" name="botcheck" tabIndex={-1} autoComplete="off" aria-hidden="true" className="hidden" />
 
-            <div>
-              <label htmlFor="contact-name" className="label">
-                Name
-              </label>
-              <input
-                id="contact-name"
-                name="name"
-                type="text"
-                required
-                autoComplete="name"
-                placeholder="Your name"
-                className={cn(fieldClass, "mt-2.5")}
-              />
-            </div>
+              <div>
+                <label htmlFor="contact-name" className="label">
+                  Name
+                </label>
+                <input
+                  id="contact-name"
+                  name="name"
+                  type="text"
+                  required
+                  autoComplete="name"
+                  placeholder="Your name"
+                  className={cn(fieldClass, "mt-2.5")}
+                />
+              </div>
 
-            <div>
-              <label htmlFor="contact-email" className="label">
-                Email
-              </label>
-              <input
-                id="contact-email"
-                name="email"
-                type="email"
-                required
-                autoComplete="email"
-                placeholder="you@company.com"
-                className={cn(fieldClass, "mt-2.5")}
-              />
-            </div>
+              <div>
+                <label htmlFor="contact-email" className="label">
+                  Email
+                </label>
+                <input
+                  id="contact-email"
+                  name="email"
+                  type="email"
+                  required
+                  autoComplete="email"
+                  placeholder="you@company.com"
+                  className={cn(fieldClass, "mt-2.5")}
+                />
+              </div>
 
-            <div>
-              <label htmlFor="contact-message" className="label">
-                Message
-              </label>
-              <textarea
-                id="contact-message"
-                name="message"
-                required
-                rows={4}
-                placeholder="What are you working on?"
-                className={cn(fieldClass, "mt-2.5 resize-y")}
-              />
-            </div>
+              <div>
+                <label htmlFor="contact-message" className="label">
+                  Message
+                </label>
+                <textarea
+                  id="contact-message"
+                  name="message"
+                  required
+                  rows={4}
+                  placeholder="What are you working on?"
+                  className={cn(fieldClass, "mt-2.5 resize-y")}
+                />
+              </div>
 
-            <div className="flex flex-wrap items-center gap-4">
-              <button
-                type="submit"
-                disabled={status === "sending"}
-                className="inline-flex h-11 items-center justify-center rounded-md bg-fg px-5 text-sm font-medium text-bg transition-[background-color,transform] duration-[var(--dur)] hover:bg-fg/90 active:translate-y-px disabled:opacity-50"
-              >
-                {status === "sending" ? "Sending…" : "Send message"}
-              </button>
+              <div className="flex flex-wrap items-center gap-4 pt-1">
+                <button
+                  type="submit"
+                  disabled={status === "sending"}
+                  className="inline-flex h-11 items-center justify-center rounded-md bg-accent px-5 text-sm font-medium text-accent-fg shadow-xs transition-[background-color,transform,box-shadow] duration-[var(--dur)] hover:bg-accent-hover hover:shadow-sm active:translate-y-px disabled:opacity-50"
+                >
+                  {status === "sending" ? "Sending…" : "Send message"}
+                </button>
 
-              <p
-                role="status"
-                aria-live="polite"
-                className={cn(
-                  "text-sm transition-opacity duration-[var(--dur)]",
-                  status === "error" ? "text-accent" : "text-fg-secondary",
-                  status === "sent" || status === "error" ? "opacity-100" : "opacity-0",
-                )}
-              >
-                {status === "sent" ? "Sent — I'll come back to you." : null}
-                {status === "error" ? `Did not send. Email me at ${profile.email}.` : null}
-              </p>
-            </div>
-          </form>
+                <p
+                  role="status"
+                  aria-live="polite"
+                  className={cn(
+                    "text-sm transition-opacity duration-[var(--dur)]",
+                    status === "error" ? "text-fg" : "text-fg-secondary",
+                    status === "sent" || status === "error" ? "opacity-100" : "opacity-0",
+                  )}
+                >
+                  {status === "sent" ? "Sent — I'll come back to you." : null}
+                  {status === "error" ? `Did not send. Email me at ${profile.email}.` : null}
+                </p>
+              </div>
+            </form>
+          </div>
         </div>
       </div>
     </Section>

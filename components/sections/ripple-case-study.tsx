@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect, useRef, useState } from "react"
+import { useEffect, useState } from "react"
 import { rippleChapters } from "@/lib/content"
 import { FactGrid, StackList } from "@/components/primitives"
 import { cn } from "@/lib/utils"
@@ -8,13 +8,12 @@ import { cn } from "@/lib/utils"
 /**
  * The Ripple case study.
  *
- * Chapters are plain server-rendered prose — nothing is hidden behind a tab, so
- * the whole thing is readable, linkable and indexable. The only interactive
- * part is the sticky chapter rail, which tracks reading position.
+ * Chapters are plain prose — nothing is hidden behind a tab, so the whole thing
+ * is readable, linkable and indexable. The only interactive part is the sticky
+ * chapter rail, which tracks reading position.
  */
 export function RippleCaseStudy() {
   const [active, setActive] = useState(rippleChapters[0].id)
-  const root = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
     const nodes = rippleChapters
@@ -40,13 +39,13 @@ export function RippleCaseStudy() {
   }, [])
 
   return (
-    <div ref={root} className="mt-24 border-t border-line pt-12 lg:mt-32">
-      <div className="grid gap-x-12 gap-y-10 lg:grid-cols-12">
+    <div className="mt-24 border-t border-line pt-14 lg:mt-32">
+      <div className="grid gap-x-16 gap-y-10 lg:grid-cols-12">
         {/* Chapter rail */}
-        <nav aria-label="Case study chapters" className="min-w-0 lg:col-span-3 lg:sticky lg:top-28 lg:self-start">
+        <nav aria-label="Case study chapters" className="min-w-0 lg:sticky lg:top-28 lg:col-span-3 lg:self-start">
           <p className="label">Case study</p>
           {/* Wraps on small screens rather than scrolling sideways: four short
-              chapters fit two lines, and nothing needs a hidden scroll gesture. */}
+              chapters fit two lines, and nothing needs a hidden gesture. */}
           <ul className="mt-5 flex flex-wrap gap-x-5 gap-y-1 lg:flex-col lg:flex-nowrap lg:gap-0">
             {rippleChapters.map((chapter) => {
               const isActive = active === chapter.id
@@ -56,13 +55,14 @@ export function RippleCaseStudy() {
                     href={`#ripple-${chapter.id}`}
                     aria-current={isActive ? "true" : undefined}
                     className={cn(
-                      "group flex items-baseline gap-3 whitespace-nowrap py-1.5 text-sm transition-colors duration-[var(--dur)] lg:border-l lg:py-2.5 lg:pl-4",
-                      isActive
-                        ? "text-fg lg:border-accent"
-                        : "text-fg-muted hover:text-fg-secondary lg:border-line",
+                      "group flex items-baseline gap-3 py-1.5 text-sm font-medium whitespace-nowrap transition-colors duration-[var(--dur)]",
+                      "lg:border-l-2 lg:py-2.5 lg:pl-4",
+                      isActive ? "text-fg lg:border-l-accent" : "text-fg-muted hover:text-fg-secondary lg:border-l-line",
                     )}
                   >
-                    <span className="font-mono text-[0.6875rem] tabular-nums text-fg-muted">{chapter.index}</span>
+                    <span className={cn("font-mono text-[0.6875rem] tabular-nums", isActive ? "text-accent" : "text-fg-muted")}>
+                      {chapter.index}
+                    </span>
                     {chapter.title}
                   </a>
                 </li>
@@ -79,14 +79,15 @@ export function RippleCaseStudy() {
               id={`ripple-${chapter.id}`}
               className={cn("scroll-mt-28", i > 0 && "mt-16 border-t border-line pt-14 lg:mt-20")}
             >
-              <div className="flex items-baseline gap-3">
-                <span className="label tabular-nums">{chapter.index}</span>
+              <div className="flex items-center gap-3">
+                <span className="label tabular-nums text-accent">{chapter.index}</span>
+                <span aria-hidden="true" className="h-px w-6 bg-accent/40" />
                 <span className="label">{chapter.title}</span>
               </div>
 
-              <h3 className="reveal mt-5 max-w-[26ch] text-h3 font-medium text-fg">{chapter.lead}</h3>
+              <h3 className="reveal mt-5 max-w-[26ch] text-h3 font-semibold text-fg">{chapter.lead}</h3>
 
-              <div className="reveal mt-5 max-w-prose space-y-4 text-body text-fg-secondary">
+              <div className="reveal mt-5 max-w-[64ch] space-y-4 text-body text-fg-secondary">
                 {chapter.body.map((paragraph) => (
                   <p key={paragraph.slice(0, 32)}>{paragraph}</p>
                 ))}
@@ -97,22 +98,18 @@ export function RippleCaseStudy() {
               ) : null}
 
               {chapter.surfaces ? (
-                <div className="mt-12 grid gap-px overflow-hidden rounded-md border border-line bg-line sm:grid-cols-2">
-                  {chapter.surfaces.map((surface, j) => (
+                <div className="reveal mt-12 grid gap-px overflow-hidden rounded-lg border border-line bg-line sm:grid-cols-2">
+                  {chapter.surfaces.map((surface) => (
                     <section
                       key={surface.title}
-                      className="reveal bg-bg p-6 sm:p-7"
-                      style={{ "--reveal-delay": `${j * 70}ms` } as React.CSSProperties}
+                      className="bg-bg p-6 sm:p-7"
                     >
-                      <h4 className="text-sm font-medium text-fg">{surface.title}</h4>
+                      <h4 className="text-sm font-semibold text-fg">{surface.title}</h4>
                       <StackList items={surface.stack} className="mt-3" />
                       <ul className="mt-5 space-y-3">
                         {surface.points.map((point) => (
                           <li key={point.slice(0, 32)} className="flex gap-3 text-sm text-fg-secondary">
-                            <span
-                              aria-hidden="true"
-                              className="mt-[0.55rem] h-px w-3 shrink-0 bg-line-strong"
-                            />
+                            <span aria-hidden="true" className="mt-[0.6rem] h-px w-3 shrink-0 bg-accent/50" />
                             <span>{point}</span>
                           </li>
                         ))}

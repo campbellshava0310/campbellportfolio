@@ -5,13 +5,14 @@ import { useEffect } from "react"
 /**
  * One IntersectionObserver for the whole page.
  *
- * Every `.reveal` element on the document is observed by this single instance
- * and unobserved the moment it lands, rather than each section mounting its own
- * observer or — worse — re-rendering on scroll. Nothing here touches React state.
+ * Every `.reveal` and `.reveal-media` element is observed by this single
+ * instance and unobserved the moment it lands — each element settles exactly
+ * once and then never moves again. Nothing here touches React state, and
+ * nothing re-runs on scroll.
  */
 export function RevealObserver() {
   useEffect(() => {
-    const elements = Array.from(document.querySelectorAll<HTMLElement>(".reveal"))
+    const elements = Array.from(document.querySelectorAll<HTMLElement>(".reveal, .reveal-media"))
     if (elements.length === 0) return
 
     const show = (el: HTMLElement) => {
@@ -32,7 +33,7 @@ export function RevealObserver() {
           observer.unobserve(entry.target)
         }
       },
-      { rootMargin: "0px 0px -6% 0px", threshold: 0.08 },
+      { rootMargin: "0px 0px -8% 0px", threshold: 0.06 },
     )
 
     elements.forEach((el) => observer.observe(el))
