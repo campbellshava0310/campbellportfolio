@@ -100,6 +100,9 @@ type ActionProps = {
   "aria-label"?: string
 }
 
+/** Static files (e.g. the CV PDF) are not app routes, so next/link must not prefetch them. */
+const isFile = (href: string) => /\.[a-z0-9]+($|[?#])/i.test(href.split("/").pop() ?? "")
+
 export function Action({
   href,
   variant = "primary",
@@ -111,7 +114,7 @@ export function Action({
 }: ActionProps) {
   const classes = cn(buttonBase, buttonVariants[variant], className)
 
-  if (external || download) {
+  if (external || download || isFile(href)) {
     return (
       <a
         href={href}
@@ -151,9 +154,9 @@ export function TextLink({
     "link-underline text-accent transition-colors duration-[var(--dur)] hover:text-accent-hover",
     className,
   )
-  if (external) {
+  if (external || isFile(href)) {
     return (
-      <a href={href} target="_blank" rel="noopener noreferrer" className={classes}>
+      <a href={href} {...(external ? { target: "_blank", rel: "noopener noreferrer" } : {})} className={classes}>
         {children}
       </a>
     )

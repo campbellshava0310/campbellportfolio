@@ -12,6 +12,9 @@
 [build.environment]
   # Next 16 requires Node >= 20.9.
   NODE_VERSION = "22"
+  # The site is a static export, so the auto-installed Next.js Runtime has
+  # nothing to do; its post-build step was failing the deploy. Skip it.
+  NETLIFY_NEXT_PLUGIN_SKIP = "true"
 
 # The metadata route emits a real PNG at an extensionless path, so the type has
 # to be declared or social crawlers receive application/octet-stream.
